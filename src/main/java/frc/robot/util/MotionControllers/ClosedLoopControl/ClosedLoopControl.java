@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.MotionControllers.ClosedLoopControl;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.util.Elastic;
 import frc.robot.util.Elastic.Notification;
 import frc.robot.util.Elastic.Notification.NotificationLevel;
-import frc.robot.util.Gains;
+import frc.robot.util.MotionControllers.Gains;
 
 public class ClosedLoopControl {
 

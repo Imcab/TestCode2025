@@ -1,7 +1,5 @@
 package frc.robot.com;
 
-import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.sub.AlgaeWrist;
 
@@ -10,13 +8,12 @@ public class AlgaeCommand extends Command{
     double parameterout;
     AlgaeWrist algae;
     boolean isFinished;
-    Debouncer timer;
-    public AlgaeCommand(AlgaeWrist algae, double parameteralign, double parameterout, double seconds){
+    public AlgaeCommand(AlgaeWrist algae, double parameteralign, double parameterout){
         this.algae = algae;
         this.parameteralign = parameteralign;
         this.parameterout = parameterout;
-        this.timer = new Debouncer(seconds);
-
+   
+        addRequirements(algae);
     }
     @Override
     public void initialize () {
@@ -28,7 +25,7 @@ public class AlgaeCommand extends Command{
     @Override
     public void execute (){
         algae.setPosition(parameteralign);
-
+        algae.runWheels(parameterout);
 
         /*if (algae.getPosition() <=  parameteralign + 0.1 && algae.getPosition() <=  parameteralign - 0.1) {
             algae.runWheels(parameterout);

@@ -13,9 +13,9 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.WristConstants.Algae;
-import frc.robot.util.ClosedLoopControl;
-import frc.robot.util.ClosedLoopControl.ClosedLoopRequest;
-import frc.robot.util.ClosedLoopControl.OutputType;
+import frc.robot.util.MotionControllers.ClosedLoopControl.ClosedLoopControl;
+import frc.robot.util.MotionControllers.ClosedLoopControl.ClosedLoopControl.ClosedLoopRequest;
+import frc.robot.util.MotionControllers.ClosedLoopControl.ClosedLoopControl.OutputType;
 
 public class AlgaeWrist extends SubsystemBase{
 
@@ -102,9 +102,10 @@ public class AlgaeWrist extends SubsystemBase{
         return request.setpoint;
     }
 
-    public void setPosition(double rotation){
-        wrist.set(pid.runRequest(request.withReference(getPosition()).toSetpoint(rotation + 5)));
+    public void setPosition(double degrees){
+        wrist.set(pid.runRequest(request.withReference(getPosition()).toSetpoint(degrees + 5)));
     }
+
 
     public boolean atGoal(){
         return Math.abs(getPosition() - currentSetpoint()) <= Algae.tolerance;

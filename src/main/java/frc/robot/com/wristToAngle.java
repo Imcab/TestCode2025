@@ -3,11 +3,11 @@ package frc.robot.com;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.sub.CoralWrist;
 
-public class i extends Command {
+public class wristToAngle extends Command {
     CoralWrist w;
     double degrees;
 
-    public i(CoralWrist w, double degrees){
+    public wristToAngle(CoralWrist w, double degrees){
         this.w = w;
         this.degrees = degrees;
         addRequirements(w);

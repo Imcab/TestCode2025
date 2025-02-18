@@ -1,26 +1,26 @@
 package frc.robot;
 
-import frc.robot.util.Gains;
 import frc.robot.util.ModuleMap;
+import frc.robot.util.MotionControllers.Gains;
 
 public class Constants {
 
   public class ElevatorConstants {
 
         //different profile PID GAINS
-        public static final Gains k1_GAINS = new Gains(0.047, 0, 0.0005);
-        public static final Gains k2_GAINS = new Gains(0.038 , 0, 0);
-        public static final Gains k3_GAINS = new Gains(0.34, 0, 0);
+        public static final Gains k1_GAINS = new Gains(0.045, 0, 0.00009);
+        public static final Gains k2_GAINS = new Gains(0.042 , 0, 0);
+        public static final Gains k3_GAINS = new Gains(0.060, 0, 0.0005);
         public static final int CAN_ID_LEADER = 15;
         public static final int CAN_ID_SLAVE = 16;
         public static final boolean leaderInverted = false;
         public static final boolean slaveInverted = true;
         public static final double IDLE_POSITION = 63;
         public static final double SETPOINT_RETRACT = IDLE_POSITION + 3;
-        public static final double SETPOINT_FEEDER = 83.7;
-        public static final double SETPOINT_L2 = 73.5;
-        public static final double SETPOINT_L3 = 113.5;
-        public static final double SETPOINT_L4 = 188;
+        public static final double SETPOINT_FEEDER = 84.7;
+        public static final double SETPOINT_L2 = 73.9;
+        public static final double SETPOINT_L3 = 119;
+        public static final double SETPOINT_L4 = 186;
         public static final double ERROR_TOLERANCE = 1.5; //error of 1.5 centimeters 
         public static final double CONVERSION_FACTOR = 120.9 / 20.85; 
         public static final double ELEVATOR_OFFSET = 63;
@@ -37,7 +37,7 @@ public class Constants {
         public static final int CAN_ID_LEFTWHEEL = 14;
         public static final boolean wristMotorInverted = false;
         public static final boolean RightInverted = false;
-        public static final boolean LeftInverted = false;
+        public static final boolean LeftInverted = true;
         public static final int wristCurrentLimit = 30;
         public static final int WheelsCurrentLimit = 25;
         public static final Gains GAINS = new Gains(0.005,0,0);
@@ -60,7 +60,7 @@ public class Constants {
             public static final boolean wheelInverted = false;
             public static final int wristCurrentLimit = 40;
             public static final int wheelCurrentLimit = 15;
-            public static final Gains Gains = new Gains(0.063,0.0063,0.0003);
+            public static final Gains Gains = new Gains(0.072,0.0063,0.0001);
             public static final double encoderPositionFactor = 360; //degrees
             public static final double INTAKE_SPEED = 0;
             public static final double wristErrorTolerance = 0.1; 

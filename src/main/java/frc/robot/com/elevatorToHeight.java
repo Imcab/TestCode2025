@@ -1,32 +1,30 @@
 package frc.robot.com;
 
-import java.util.function.DoubleSupplier;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.sub.Elevator;
 
-public class m extends Command{
+public class elevatorToHeight extends Command{
     Elevator e;
-    DoubleSupplier x;
-    public m(Elevator e, DoubleSupplier x){
+    double y;
+    public elevatorToHeight(Elevator e, double y){
         this.e = e;
-        this.x = x;
+        this.y = y;
         addRequirements(e);
     }
 
     @Override
     public void initialize() {
+    
     }
 
     @Override
     public void execute(){
-        double c = x.getAsDouble();
-        e.runSpeed(c);
+        e.runRequest(y);
     }
 
     @Override
     public boolean isFinished() {
-        return e.atGoal();
+        return false;
     }
 
     @Override

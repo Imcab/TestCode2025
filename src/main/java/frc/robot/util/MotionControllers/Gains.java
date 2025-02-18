@@ -1,5 +1,5 @@
 //v1.0.2
-package frc.robot.util;
+package frc.robot.util.MotionControllers;
 
 /**
  * Represents PID and motion parameters for control systems.

@@ -7,26 +7,24 @@ import frc.robot.Constants.WristConstants.Coral;
 import frc.robot.sub.CoralWrist;
 import frc.robot.sub.Elevator;
 
-public class r extends Command{
+public class wristSpeed extends Command{
     CoralWrist y;
-    double degrees, speed;
-    public r(CoralWrist y, double degrees, double speed){
+    double  speed;
+    public wristSpeed(CoralWrist y, double speed){
         this.y = y;
-        this.degrees = degrees;
+
         this.speed = speed;
         addRequirements(y);
     }
 
     @Override
     public void initialize() {
-        y.wheelSpeed(speed);
+        
     }
 
     @Override
     public void execute(){
-        
-        y.atun().execute();
-        
+        y.wheelSpeed(speed);
     }
 
     @Override

@@ -15,9 +15,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.util.Domain;
-import frc.robot.util.Gains;
-import frc.robot.util.ClosedLoopControl;
-import frc.robot.util.ClosedLoopControl.ClosedLoopRequest;
+import frc.robot.util.MotionControllers.Gains;
+import frc.robot.util.MotionControllers.ClosedLoopControl.ClosedLoopControl;
+import frc.robot.util.MotionControllers.ClosedLoopControl.ClosedLoopControl.ClosedLoopRequest;
 
 public class Elevator extends SubsystemBase {
 

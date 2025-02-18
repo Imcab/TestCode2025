@@ -1,25 +1,25 @@
 package frc.robot.com;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.sub.Elevator;
+import frc.robot.sub.CoralWrist;
 
-public class k extends Command{
-    Elevator e;
-    double y;
-    public k(Elevator e, double y){
-        this.e = e;
-        this.y = y;
-        addRequirements(e);
+public class parallelCoral extends Command{
+    CoralWrist wrist;
+
+
+    public parallelCoral(CoralWrist wrist){
+        this.wrist = wrist;
+        addRequirements(wrist);
     }
 
     @Override
     public void initialize() {
-    
     }
 
     @Override
     public void execute(){
-        e.runRequest(y);
+        wrist.requestPosition(1.5);
+        wrist.wheelSpeed(0.3);
     }
 
     @Override
@@ -29,6 +29,6 @@ public class k extends Command{
 
     @Override
     public void end(boolean interrupted) {
-        e.stop();
+        wrist.stop();
     }
 }

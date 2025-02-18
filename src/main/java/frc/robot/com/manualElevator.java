@@ -1,19 +1,17 @@
 package frc.robot.com;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.sub.AlgaeWrist;
-import frc.robot.sub.CoralWrist;
 import frc.robot.sub.Elevator;
 
-public class speed extends Command{
+public class manualElevator extends Command{
     Elevator e;
-    double x;
-    CoralWrist w;
-    public speed(Elevator e, double x, CoralWrist w, AlgaeWrist a){
+    DoubleSupplier x;
+    public manualElevator(Elevator e, DoubleSupplier x){
         this.e = e;
         this.x = x;
-        this.w = w;
-        addRequirements(e, w, a);
+        addRequirements(e);
     }
 
     @Override
@@ -22,19 +20,17 @@ public class speed extends Command{
 
     @Override
     public void execute(){
-        w.requestPosition(0.3);
-        e.runSpeed(x);
+        double c = x.getAsDouble();
+        e.runSpeed(c);
     }
 
     @Override
     public boolean isFinished() {
-        return e.pressed();
+        return e.atGoal();
     }
 
     @Override
     public void end(boolean interrupted) {
         e.stop();
-        w.stop();
-
     }
 }

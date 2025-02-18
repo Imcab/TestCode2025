@@ -1,5 +1,7 @@
 package frc.robot.sub;
 
+import java.util.function.DoubleSupplier;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -12,9 +14,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.WristConstants.Coral;
-import frc.robot.util.ClosedLoopControl;
-import frc.robot.util.ClosedLoopControl.ClosedLoopRequest;
-import frc.robot.util.ClosedLoopControl.OutputType;
+import frc.robot.util.MotionControllers.ClosedLoopControl.ClosedLoopControl;
+import frc.robot.util.MotionControllers.ClosedLoopControl.ClosedLoopControl.ClosedLoopRequest;
+import frc.robot.util.MotionControllers.ClosedLoopControl.ClosedLoopControl.OutputType;
 
 public class CoralWrist extends SubsystemBase{
     
@@ -89,15 +91,10 @@ public class CoralWrist extends SubsystemBase{
         SmartDashboard.putNumber("[CORALWRIST]: RawPosition:", getRawPosition());
         SmartDashboard.putBoolean("[CORALWRIST]: AtGoal:"  , atGoal());
         SmartDashboard.putNumber("[CORALWRIST]: Target:", target);
+        SmartDashboard.putNumber("CoralP", getRawPosition());
     }
 
-    public Command atun(){
-    Command a = Commands.run(()-> requestPosition(2), this);
-    a.beforeStarting(Commands.waitSeconds(2));
-    return a;
-  }
-    
-    
+     
     public boolean hasPiece(){
         //return beamBreaker.get();
         return false;
@@ -109,6 +106,11 @@ public class CoralWrist extends SubsystemBase{
 
     public void setZero(){
         wristEncoder.setPosition(0);
+    }
+
+    
+    public void setSpeed(double speed){
+        wrist.set(speed);
     }
 
     public void requestPosition(double rotations){
