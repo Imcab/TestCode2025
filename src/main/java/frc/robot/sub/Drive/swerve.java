@@ -21,10 +21,14 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.util.LimelightHelpers;
 import frc.robot.util.SwerveConfig;
+import frc.robot.util.VisionConfig;
+import frc.robot.util.VisionConfig.limelight;
 
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
@@ -52,9 +56,9 @@ public class swerve extends SubsystemBase{
         Math.hypot(TRACK_WIDTH_X / 2.0, TRACK_WIDTH_Y / 2.0);
     private static final double MAX_ANGULAR_SPEED = MAX_LINEAR_SPEED / DRIVE_BASE_RADIUS;
 
-    //private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
+    private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
 
-    private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(SwerveConfig.measures.getTranslations());
+    //private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(SwerveConfig.measures.getTranslations());
 
     private Rotation2d rawGyroRotation = new Rotation2d();
     private SwerveModulePosition[] lastModulePositions = // For delta tracking
@@ -68,6 +72,8 @@ public class swerve extends SubsystemBase{
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
     ModuleSpark []modules  = new ModuleSpark[4];
+
+    Vision vision = new Vision();
 
     public swerve(){
 
@@ -89,11 +95,20 @@ public class swerve extends SubsystemBase{
         
     }
 
+    public void stopAndEject() {
+      runVelocity(new ChassisSpeeds());
+      ejectLime();
+    }
+  
     public void periodic(){
 
       odometrypublisher.set(getPose());
       ChassisSpeedpublisher.set(getChassisSpeeds());
       ModuleStatepublisher.set(getModuleStates());
+
+      vision.periodic();
+
+      LimelightHelpers.SetRobotOrientation(limelight.name, poseEstimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
 
     
       /*if (!vision.isLimeEmpty()) {
@@ -147,7 +162,7 @@ public class swerve extends SubsystemBase{
 
     
     public Rotation2d getnavXRotation(){
-      return Rotation2d.fromDegrees(getAngle());
+      return Rotation2d.fromDegrees(-getAngle());
     }
 
     public ChassisSpeeds getChassisSpeeds(){
@@ -267,7 +282,50 @@ public class swerve extends SubsystemBase{
   }
   public void addObservation(Pose2d pose, double timeStamps){
     poseEstimator.addVisionMeasurement(pose, timeStamps);
-}
+  }
+
+  public void centerWithApriltag(double y){
+    var State = kinematics.toSwerveModuleStates(
+      ChassisSpeeds.discretize(
+        new ChassisSpeeds(
+          vision.range(),
+          y,
+          vision.aim()),
+          0.02));
+
+    SwerveDriveKinematics.desaturateWheelSpeeds(State, VisionConfig.limelight.TrackMaxSpeed);
+
+    for (int i = 0; i < 4; i++) {
+      // The module returns the optimized state, useful for logging
+      modules[i].runSetpoint(State[i]);
+    }
+  }
+
+  public void centerWithReef(double y, double limit){
+    var State = kinematics.toSwerveModuleStates(
+      ChassisSpeeds.discretize(
+        new ChassisSpeeds(
+          vision.forwardWithLimit(limit),
+          y,
+          vision.aim()),
+          0.02));
+
+    SwerveDriveKinematics.desaturateWheelSpeeds(State, VisionConfig.limelight.TrackMaxSpeed);
+
+    for (int i = 0; i < 4; i++) {
+      // The module returns the optimized state, useful for logging
+      modules[i].runSetpoint(State[i]);
+    }
+  }
+
+
+  public void requestLime(){
+    vision.limeRequest(true);
+  }
+
+  public void ejectLime(){
+    vision.limeRequest(false);
+  }
 
  
 

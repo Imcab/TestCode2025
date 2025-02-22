@@ -74,6 +74,10 @@ public class Trapezoidal {
         return gains;
     }
 
+    public void reset(double measurement){
+        controller.reset(measurement);
+    }
+
     public double getOutput() {
         return output;
     }
@@ -87,6 +91,7 @@ public class Trapezoidal {
     }
 
     public State getSetpoint(){
+        
         return controller.getSetpoint();
     }
 

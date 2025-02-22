@@ -36,16 +36,10 @@ public class feed extends Command {
 
     @Override
     public void execute(){
-        elevator.runRequest(ElevatorConstants.SETPOINT_FEEDER);
+        elevator.runMotion(0.847);
 
-        if (feedRange.inRange(elevator.getCentimeters())){
-            coral.requestPosition(CoralFeed);
-        }
-
-        if (coralRange.inRange(coral.getRawPosition())){
-            coral.wheelSpeed(-0.55);
-        }
-
+        coral.requestPosition(CoralFeed);
+        coral.wheelSpeed(-0.55);
     
     }
             

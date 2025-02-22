@@ -17,12 +17,12 @@ public class VisionConfig {
         public static final int forwardCoefficient = 1; // if the robot never turns in the correct direction, kP should be inverted.
         public static final int aimCoefficient = -1;
         public static final boolean useMegatag2 = true;
-        public static final double forwardKp = 0.2;
-        public static final double angularKp = 0.01158;
+        public static final double forwardKp = 0.07; //0.2
+        public static final double angularKp = 0.005; //0.01158
         public static final boolean useTAforRange = true;
         public static final Matrix<N3,N1> trust = VecBuilder.fill(0.7, 0.7, 99999);
 
-        public static final double TrackMaxSpeed = QoLUtil.percentageOf(90, SwerveConfig.speeds.MAX_LINEAR_SPEED);
+        public static final double TrackMaxSpeed = QoLUtil.percentageOf(60, SwerveConfig.speeds.MAX_LINEAR_SPEED);
         public static final double TrackMaxAngularSpeed = Math.PI;
         
     }

@@ -1,6 +1,7 @@
 package frc.robot.com;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -14,6 +15,8 @@ import frc.robot.sub.Drive.swerve;
 import frc.robot.util.QoLUtil;
 
 import java.util.function.DoubleSupplier;
+
+
 
 public class DriveCommands {
 
@@ -83,6 +86,51 @@ public class DriveCommands {
         }, drive);
   }
 
+  public static Command getInRange(
+      swerve drive,
+      DoubleSupplier ySupplier) {
+
+    final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
+  
+    return Commands.run(
+        () -> {
+
+        drive.requestLime();
+
+        var ySpeed =
+        -m_yspeedLimiter.calculate(MathUtil.applyDeadband(ySupplier.getAsDouble(), DEADBAND));
+            
+        drive.centerWithApriltag(ySpeed);
+
+        },
+    
+        drive).finallyDo(
+        drive::stopAndEject
+        );
+    }
+
+    public static Command toReef(
+      swerve drive,
+      DoubleSupplier ySupplier, double ty) {
+
+    final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
+  
+    return Commands.run(
+        () -> {
+
+        drive.requestLime();
+
+        var ySpeed =
+        -m_yspeedLimiter.calculate(MathUtil.applyDeadband(ySupplier.getAsDouble(), DEADBAND));
+            
+        drive.centerWithReef(ySpeed, ty);
+
+        },
+    
+        drive).finallyDo(
+        drive::stopAndEject
+        );
+    }
 
 }
   

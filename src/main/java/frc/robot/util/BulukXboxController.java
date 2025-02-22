@@ -55,32 +55,36 @@ public class BulukXboxController extends CommandXboxController{
      * Gets the controller leftY axis
      * @return axis
      */
-    public DoubleSupplier leftY(){
-        return ()-> MathUtil.applyDeadband(getLeftY(), LEFT_DEADBAND);
+    public DoubleSupplier leftY(boolean inverted){
+        double output = inverted ? MathUtil.applyDeadband(-getLeftY(), LEFT_DEADBAND) : MathUtil.applyDeadband(getLeftY(), LEFT_DEADBAND);
+        return ()-> output;
     }
 
     /**
      * Gets the controller leftX axis
      * @return axis
      */
-    public DoubleSupplier leftX(){
-        return ()-> MathUtil.applyDeadband(getLeftX(), LEFT_DEADBAND);
+    public DoubleSupplier leftX(boolean inverted){
+        double output = inverted ? MathUtil.applyDeadband(-getLeftX(), LEFT_DEADBAND) : MathUtil.applyDeadband(getLeftX(), LEFT_DEADBAND);
+        return ()-> output;
     }
 
     /**
      * Gets the controller rightY axis
      * @return axis
      */
-    public DoubleSupplier rightY(){
-        return ()-> MathUtil.applyDeadband(getRightY(), RIGHT_DEADBAND);
+    public DoubleSupplier rightY(boolean inverted){
+        double output = inverted ? MathUtil.applyDeadband(-getRightY(), RIGHT_DEADBAND) : MathUtil.applyDeadband(getRightY(), RIGHT_DEADBAND);
+        return ()-> output;
     }
 
     /**
      * Gets the controller rightX axis
      * @return axis
      */
-    public DoubleSupplier rightX(){
-        return ()-> MathUtil.applyDeadband(getRightX(), RIGHT_DEADBAND);
+    public DoubleSupplier rightX(boolean inverted){
+        double output = inverted ? MathUtil.applyDeadband(-getRightX(), RIGHT_DEADBAND) : MathUtil.applyDeadband(getRightX(), RIGHT_DEADBAND);
+        return ()-> output;
     }
 
     /**

@@ -19,7 +19,8 @@ public class elevatorToHeight extends Command{
 
     @Override
     public void execute(){
-        e.runRequest(y);
+        //e.runRequest(y);
+        e.runMotion(y);
     }
 
     @Override

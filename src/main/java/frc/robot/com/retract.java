@@ -1,23 +1,16 @@
 package frc.robot.com;
+
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.sub.AlgaeWrist;
 import frc.robot.sub.CoralWrist;
 import frc.robot.sub.Elevator;
 
-
-public class Rise extends Command{
-    private final Elevator elevator;
-    private final CoralWrist coral;
-    private double angleRotations;
-
-    public double height;
-
-    public Rise(Elevator elevator, CoralWrist coral, double height, double angleRotations){
+public class retract extends Command{
+    Elevator elevator;
+    CoralWrist coral;
+    public retract(Elevator elevator, CoralWrist coral){
         this.elevator = elevator;
         this.coral = coral;
-        this.height = height;
-        this.angleRotations = angleRotations;
-
+  
         addRequirements(elevator, coral);
     }
 
@@ -29,14 +22,15 @@ public class Rise extends Command{
     @Override
     public void execute(){
         
-        elevator.runMotion(height);
-        coral.requestPosition(angleRotations);
+        elevator.runMotion(0.7);
+        coral.requestPosition(0.1);
 
     }
 
     @Override
     public void end(boolean interrupted) {
-
+        elevator.stop();
+        coral.stop();
     }
 
 
@@ -45,5 +39,4 @@ public class Rise extends Command{
         
         return false;
     }
-    
 }

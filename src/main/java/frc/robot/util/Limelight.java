@@ -89,8 +89,28 @@ public class Limelight {
         targetingForwardSpeed *= limelight.TrackMaxSpeed;
         targetingForwardSpeed *= limelight.forwardCoefficient;
 
-        return targetingForwardSpeed;
+        return -targetingForwardSpeed;
     }
+    public double limitForward(double TY){
+
+        // simple proportional ranging control with Limelight's "ty" value
+        // this works best if your Limelight's mount height and target mount height are different.
+        // if your limelight and target are mounted at the same or similar heights, use "ta" (area) for target ranging rather than "ty"
+
+        double method = limelight.useTAforRange ? tagPercentage(): ty();
+
+        double targetingForwardSpeed = method * limelight.forwardKp ;
+    
+        targetingForwardSpeed *= limelight.TrackMaxSpeed;
+        targetingForwardSpeed *= limelight.forwardCoefficient;
+
+        if (LimelightHelpers.getTY(kName) >= TY) {
+            targetingForwardSpeed = 0;
+        }
+
+        return -targetingForwardSpeed;
+    }
+
     public double aimAngular(){
         
         // tx ranges from (-hfov/2) to (hfov/2) in degrees. If your target is on the rightmost edge of 
@@ -103,7 +123,38 @@ public class Limelight {
         //invert since tx is positive when the target is to the right of the crosshair
         targetingAngularVelocity *= limelight.aimCoefficient;
 
-        return targetingAngularVelocity;
+        return -targetingAngularVelocity;
+    }
+
+    public double aimAngularOffSet(double offset){
+        
+        // tx ranges from (-hfov/2) to (hfov/2) in degrees. If your target is on the rightmost edge of 
+        // your limelight 3 feed, tx should return roughly 31 degrees.
+        double targetingAngularVelocity = (tx() + offset) * limelight.angularKp;
+
+        // convert to radians per second for our drive method
+        targetingAngularVelocity *= limelight.TrackMaxAngularSpeed;
+
+        //invert since tx is positive when the target is to the right of the crosshair
+        targetingAngularVelocity *= limelight.aimCoefficient;
+
+        return -targetingAngularVelocity;
+    }
+
+    public double rangeForwardOffset(double offset){
+
+        // simple proportional ranging control with Limelight's "ty" value
+        // this works best if your Limelight's mount height and target mount height are different.
+        // if your limelight and target are mounted at the same or similar heights, use "ta" (area) for target ranging rather than "ty"
+
+        double method = limelight.useTAforRange ? tagPercentage(): ty();
+
+        double targetingForwardSpeed = (method + offset) * limelight.forwardKp ;
+    
+        targetingForwardSpeed *= limelight.TrackMaxSpeed;
+        targetingForwardSpeed *= limelight.forwardCoefficient;
+
+        return -targetingForwardSpeed;
     }
     
 }

@@ -9,6 +9,8 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -28,7 +30,7 @@ public class CoralWrist extends SubsystemBase{
 
     private double target;
 
-    //private BeamSensor beamBreaker = new BeamSensor(Coral.DIO_PORT_SENSOR); 
+    private DigitalInput beamBreaker = new DigitalInput(Coral.DIO_PORT_SENSOR); 
 
     private ClosedLoopControl pid;
 
@@ -92,12 +94,12 @@ public class CoralWrist extends SubsystemBase{
         SmartDashboard.putBoolean("[CORALWRIST]: AtGoal:"  , atGoal());
         SmartDashboard.putNumber("[CORALWRIST]: Target:", target);
         SmartDashboard.putNumber("CoralP", getRawPosition());
+        SmartDashboard.putBoolean("PIECE", hasPiece());
     }
 
      
     public boolean hasPiece(){
-        //return beamBreaker.get();
-        return false;
+        return !beamBreaker.get();
     }
 
     public double getRawPosition(){

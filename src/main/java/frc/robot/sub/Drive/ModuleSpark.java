@@ -15,6 +15,10 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AnalogInput;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.DriveConstants.backLeft;
+import frc.robot.Constants.DriveConstants.backRight;
+import frc.robot.Constants.DriveConstants.frontLeft;
+import frc.robot.Constants.DriveConstants.frontRight;
 import frc.robot.util.SwerveConfig;
 import frc.robot.util.MotionControllers.ClosedLoopControl.ClosedLoopControl;
 import frc.robot.util.MotionControllers.ClosedLoopControl.ClosedLoopControl.ClosedLoopRequest;
@@ -41,8 +45,7 @@ public class ModuleSpark {
     private final SimpleMotorFeedforward drivFeedforward;
     private Rotation2d angleSetpoint = null; // Setpoint for closed loop control, null for open loop
     private Double speedSetpoint = null; // Setpoint for closed loop control, null for open loop
-    private ModuleMap map;
-
+ 
     double Offset;
 
     public ModuleSpark(int index){
@@ -67,47 +70,41 @@ public class ModuleSpark {
 
         switch (index) {
           case 0:
-            map = DriveConstants.frontLeft.fl;
-            driveSparkMax = new SparkMax(map.drive, MotorType.kBrushless);
-            turnSparkMax = new SparkMax(map.turn, MotorType.kBrushless);
-            AbsoluteEncoder = new AnalogInput(map.encoder);
-            isDriveMotorInverted = map.driveInv;
-            isTurnMotorInverted = map.turnInv;
-            Offset = map.off;
+            driveSparkMax = new SparkMax(frontLeft.DrivePort, MotorType.kBrushless);
+            turnSparkMax = new SparkMax(frontLeft.TurnPort, MotorType.kBrushless);
+            AbsoluteEncoder = new AnalogInput(frontLeft.EncPort);
+            isDriveMotorInverted = frontLeft.DrivemotorReversed;
+            isTurnMotorInverted = frontLeft.TurnmotorReversed;
+            Offset = frontLeft.offset;
             
             break;
           case 1:
-            map = DriveConstants.frontRight.fr;
-            driveSparkMax = new SparkMax(map.drive, MotorType.kBrushless);
-            turnSparkMax = new SparkMax(map.turn, MotorType.kBrushless);
-            AbsoluteEncoder = new AnalogInput(map.encoder);
-            isDriveMotorInverted = map.driveInv;
-            isTurnMotorInverted = map.turnInv;
-            Offset = map.off;
+            driveSparkMax = new SparkMax(frontRight.DrivePort, MotorType.kBrushless);
+            turnSparkMax = new SparkMax(frontRight.TurnPort, MotorType.kBrushless);
+            AbsoluteEncoder = new AnalogInput(frontRight.EncPort);
+            isDriveMotorInverted = frontRight.DrivemotorReversed;
+            isTurnMotorInverted = frontRight.TurnmotorReversed;
+            Offset = frontRight.offset;
             
 
             break;
           case 2:
-            map = DriveConstants.backLeft.bl;
-            driveSparkMax = new SparkMax(map.drive, MotorType.kBrushless);
-            turnSparkMax = new SparkMax(map.turn, MotorType.kBrushless);
-            AbsoluteEncoder = new AnalogInput(map.encoder);
-            isDriveMotorInverted = map.driveInv;
-            isTurnMotorInverted = map.turnInv;
-            Offset = map.off;
+            driveSparkMax = new SparkMax(backLeft.DrivePort, MotorType.kBrushless);
+            turnSparkMax = new SparkMax(backLeft.TurnPort, MotorType.kBrushless);
+            AbsoluteEncoder = new AnalogInput(backLeft.EncPort);
+            isDriveMotorInverted = backLeft.DrivemotorReversed;
+            isTurnMotorInverted = backLeft.TurnmotorReversed;
+            Offset = backLeft.offset;
             
-
             break;
           case 3:
-            map = DriveConstants.backRight.br;
-            driveSparkMax = new SparkMax(map.drive, MotorType.kBrushless);
-            turnSparkMax = new SparkMax(map.turn, MotorType.kBrushless);
-            AbsoluteEncoder = new AnalogInput(map.encoder);
-            isDriveMotorInverted = map.driveInv;
-            isTurnMotorInverted = map.turnInv;
-            Offset = map.off;
+            driveSparkMax = new SparkMax(backRight.DrivePort, MotorType.kBrushless);
+            turnSparkMax = new SparkMax(backRight.TurnPort, MotorType.kBrushless);
+            AbsoluteEncoder = new AnalogInput(backRight.EncPort);
+            isDriveMotorInverted = backRight.DrivemotorReversed;
+            isTurnMotorInverted = backRight.TurnmotorReversed;
+            Offset = backRight.offset;
             
-
             break;
           default:
             throw new RuntimeException("Invalid module index");
@@ -157,9 +154,7 @@ public class ModuleSpark {
       }
 
     public void periodic(){
-      turnControl.tuneWithInterface();
-      turnControl.graph("TurnGraph");
-
+      
         if (angleSetpoint != null) {
             turnSparkMax.setVoltage(
                 //turnPID.calculate(AngleEncoder().getRadians(), angleSetpoint.getRadians()));

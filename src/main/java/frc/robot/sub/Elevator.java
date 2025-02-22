@@ -1,6 +1,10 @@
 package frc.robot.sub;
 
+import static edu.wpi.first.units.Units.Centimeters;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -8,16 +12,19 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.util.Domain;
 import frc.robot.util.MotionControllers.Gains;
 import frc.robot.util.MotionControllers.ClosedLoopControl.ClosedLoopControl;
 import frc.robot.util.MotionControllers.ClosedLoopControl.ClosedLoopControl.ClosedLoopRequest;
+import frc.robot.util.MotionControllers.ClosedLoopControl.ClosedLoopControl.OutputType;
+import frc.robot.util.MotionControllers.TrapezoidalControl.Trapezoidal;
 
 public class Elevator extends SubsystemBase {
 
@@ -25,6 +32,7 @@ public class Elevator extends SubsystemBase {
   private final SparkMaxConfig leaderConfig, followerConfig;
   private final RelativeEncoder leaderEncoder, followerEncoder;
   DigitalInput limit = new DigitalInput(0);
+  private double position = 69;
 
   public enum ELEVATOR_LEVELS {
     k1, k2, k3
@@ -32,24 +40,17 @@ public class Elevator extends SubsystemBase {
 
   private ELEVATOR_LEVELS tracker = ELEVATOR_LEVELS.k1;
 
-  // Use a single ClosedLoopControl instance
-  private final ClosedLoopControl elevatorPID;
+  private final Trapezoidal motion;
 
-  private ClosedLoopRequest heightRequest;
+  private final SparkAbsoluteEncoder absEncoder;
 
-  private Domain cero_To_L2 = new Domain(ElevatorConstants.SETPOINT_RETRACT, ElevatorConstants.SETPOINT_L2);
-  private Domain L2_to_L3 = new Domain(ElevatorConstants.SETPOINT_L2, ElevatorConstants.SETPOINT_L3);
-  private Domain l3_to_L4 = new Domain(ElevatorConstants.SETPOINT_L3, ElevatorConstants.SETPOINT_L4);
+  private double vueltasAcumuladas = 0;
+  private double ultimaLectura = 0;
 
   public Elevator() {
-    // Initialize ClosedLoopControl with default gains
-    elevatorPID = new ClosedLoopControl(ElevatorConstants.k1_GAINS, ClosedLoopControl.OutputType.kPositive);
-
-    heightRequest = elevatorPID.new ClosedLoopRequest();
-
-    //Sets a tolerance and starts the tuner
-    elevatorPID.setTolerance(ElevatorConstants.ERROR_TOLERANCE); 
-    elevatorPID.initTuning("ElevatorTuner");
+  
+    motion = new Trapezoidal(ElevatorConstants.motionGains, OutputType.kPositive);
+    motion.initTuning("motionTune");
 
     leaderConfig = new SparkMaxConfig();
     followerConfig = new SparkMaxConfig();
@@ -60,13 +61,24 @@ public class Elevator extends SubsystemBase {
     leaderEncoder = leader.getEncoder();
     followerEncoder = follower.getEncoder();
 
+    absEncoder = leader.getAbsoluteEncoder();
+
+    
+
     resetEncoders();
     burnFlash();
+
+    //runMotion(0.63, 0);
+  
   }
 
   public void resetEncoders() {
     leaderEncoder.setPosition(0);
     followerEncoder.setPosition(0);
+  }
+
+  public double getVelocity(){
+    return (leaderEncoder.getVelocity() * (ElevatorConstants.CONVERSION_FACTOR / 3)) / 100;
   }
 
   private void burnFlash() {
@@ -88,15 +100,21 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
 
+    update();
+
     //Starts the graph and the tuner
-    elevatorPID.graph("ElevatorPID");
+    //elevatorPID.graph("ElevatorPID");
+
+    motion.graph("MotionGraph");
+    motion.Tune();
 
     if (pressed()) {
       resetEncoders();
+      this.position = 69;
     }
 
     //Define ranges for different PID gains   
-    if (cero_To_L2.inRange(getCentimeters())) {
+    /*if (cero_To_L2.inRange(getCentimeters())) {
         updateGains(ElevatorConstants.k1_GAINS);
         tracker = ELEVATOR_LEVELS.k1;
     }
@@ -114,59 +132,70 @@ public class Elevator extends SubsystemBase {
     //Print the current Level
     SmartDashboard.putString("ElevatorLevel", tracker.toString());
 
-    SmartDashboard.putNumber("CENT", getCentimeters());
+    SmartDashboard.putNumber("CENT", getCentimeters());*/
+
+    SmartDashboard.putNumber("VELOCITY", getVelocity());
+    SmartDashboard.putNumber("RAW", rawAbs());
+    SmartDashboard.putNumber("METERS", getPositionMeters());
+    SmartDashboard.putBoolean("SWITCG", pressed());
+    
+    
   }
 
-  private void updateGains(Gains newGains) {
-    if (!elevatorPID.currentGains().equals(newGains)) { 
-        elevatorPID.setGains(newGains);
+  private double toMeters(double value){
+    return value * ElevatorConstants.ABSOLUTE_TO_METERS;
+  }
+
+  public void start(double value){
+      motion.run(getPositionMeters(), new State(value, 0));
+  }
+
+  public double getPositionMeters(){
+    this.position =  toMeters(vueltasAcumuladas + rawAbs()) + 0.63;
+    return position;
+  }
+
+  public double getCentimeters(){
+    return getPositionMeters() * 100;
+  }
+
+  public double rawAbs(){
+    return absEncoder.getPosition();
+  }
+
+  public void update() {
+    double nuevaLectura = rawAbs(); // Valor entre 0 y 1
+
+    // Si pasamos de 0.9 a 0.1, significa que sumamos una vuelta
+    if (ultimaLectura > 0.9 && nuevaLectura < 0.1) {
+        vueltasAcumuladas++;
     }
-  }
+    // Si pasamos de 0.1 a 0.9, significa que restamos una vuelta
+    else if (ultimaLectura < 0.1 && nuevaLectura > 0.9) {
+        vueltasAcumuladas--;
+    }
 
-  public double getCentimeters() {
-    return leaderEncoder.getPosition() * (ElevatorConstants.CONVERSION_FACTOR / 3) + ElevatorConstants.ELEVATOR_OFFSET;
-  }
-
-  public double getSetpoint() {
-    return elevatorPID.getSetpoint();
-  }
+    ultimaLectura = nuevaLectura;
+}
 
   public void runSpeed(double speed) {
     leader.set(speed);
   }
 
-  public void runRequest(double height) {
-    //Runs a PID height Request
-    leader.set(elevatorPID.runRequest(heightRequest.withReference(getCentimeters()).toSetpoint(height)));
-  }
-
-  
-
-  public void retract() {
-    runRequest(ElevatorConstants.SETPOINT_RETRACT);
-  }
-
-  public void toL2() {
-    runRequest(ElevatorConstants.SETPOINT_L2);
-  }
-
-  public void toL3() {
-    runRequest(ElevatorConstants.SETPOINT_L3);
-  }
-
-  public void toL4() {
-    runRequest(ElevatorConstants.SETPOINT_L4);
-  }
-
-  public void toFeeder() {
-    runRequest(ElevatorConstants.SETPOINT_FEEDER);
-  }
-
   public boolean atGoal() {
-    return elevatorPID.atGoal();
+    return motion.atGoal();
   }
 
   public void stop() {
     leader.stopMotor();
   }
+
+  public void runMotion(double position, double velocity){
+    leader.set(motion.run(getPositionMeters(), new State(position, velocity)));
+  }
+
+  public void runMotion(double position){
+    leader.set(motion.run(getPositionMeters(), new State(position, 0)));
+  }
+
 }

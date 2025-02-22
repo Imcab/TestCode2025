@@ -38,7 +38,6 @@ public class Vision {
             limelight.LedOff();
         }
 
-
     }
  
     public PoseObservation observationLime(){
@@ -59,5 +58,11 @@ public class Vision {
     public double range(){
         return limelight.rangeForward();
     }
+
+    public double forwardWithLimit(double limit){
+        return limelight.limitForward(limit);
+    }
+
+    
 
 }
